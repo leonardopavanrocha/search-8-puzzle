@@ -59,6 +59,9 @@ class Node:
     def getLines(self):
         return self.lines
 
+    def getList(self):
+        return self.list
+
 def isTarget(S0,Sf):
     if (S0.getId() == Sf.getId()):
         return True
@@ -124,10 +127,8 @@ def getPath(S0, F):
     path = []
     parent = S0.getParentId()
     path.append(S0.getId())
-    ### sugestao pro adas: 
-        # varrer F criando uma estrutura com fácil acesso ao id e indice do elemento em F, dessa forma fica melhor.
-        # Quem mandou ir no jogo do avai?
-    while (parent != 'mirandao'):
+    ## this could be done with better performance by generating a dictionary structure indexed by the parent id
+    while (parent != 'parent'):
         for node in F:
             if (node.getId() == parent):
                 parent = node.getParentId()
@@ -163,10 +164,6 @@ def uniformCost(S0, Sf):
     F.append(S0)
     return getPath(S0, F)
 
-
-## implementar classe com id pra nao ficar iterando na merda toda
-
 Sf = Node(FINAL_STATE, 9999999, '')
-S0 = Node(START_STATE, -1, 'mirandao')
-a = 'aaaaaaa'
+S0 = Node(START_STATE, -1, 'parent')
 uniformCost(S0, Sf)

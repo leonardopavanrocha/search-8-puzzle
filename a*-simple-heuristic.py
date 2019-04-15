@@ -1,14 +1,14 @@
 from copy import deepcopy
 FINAL_STATE = [1, 2, 3, 4, 5, 6, 7, 8, None]
 START_STATE = [None, 7, 8, 6, 5, 4, 2, 3, 1]
-
 class Node:
-    def __init__(self, list, parentCost, parentId):
+    def __init__(self, numberList, parentCost, parentId):
+        self.list = numberList
         self.lines = []
-        self.lines.append(list[0:3])
-        self.lines.append(list[3:6])
-        self.lines.append(list[6:9])
-        self.id = ''.join(str(x) for x in list)
+        self.lines.append(numberList[0:3])
+        self.lines.append(numberList[3:6])
+        self.lines.append(numberList[6:9])
+        self.id = ''.join(str(x) for x in numberList)
         self.cost = parentCost+1
         self.heuristic = self.calcHeuristic()
         self.parentId = parentId
@@ -17,16 +17,19 @@ class Node:
     def calcHeuristic(self):
         global FINAL_STATE
         heuristicValue = 0
-        flatLines = []
-        # converts lines to one dimension list
-        for sublist in self.lines:
-            for item in sublist:
-                flatLines.append(item)
-        
-        for i in range(len(flatLines)):
-            if(flatLines[i] != FINAL_STATE[i]):
+        for i in range(len(self.list)):
+            if(self.list[i] != FINAL_STATE[i]):
                 heuristicValue+=1
         return heuristicValue
+
+    def print(self):
+        print('id')
+        print(self.getId())
+        print('custo')
+        print(self.getCost())
+        print('heuristica')
+        print(self.getHeuristic())
+        print(self.getHeuristic()+self.getCost())
 
     def getLocation(self):
         for i in range(len(self.lines)):
@@ -114,10 +117,8 @@ def getPath(S0, F):
     path = []
     parent = S0.getParentId()
     path.append(S0.getId())
-    ### sugestao pro adas: 
-        # varrer F criando uma estrutura com fácil acesso ao id e indice do elemento em F, dessa forma fica melhor.
-        # Quem mandou ir no jogo do avai?
-    while (parent != 'mirandao'):
+    ## this could be done with better performance by generating a dictionary structure indexed by the parent id
+    while (parent != 'parent'):
         for node in F:
             if (node.getId() == parent):
                 parent = node.getParentId()
@@ -134,7 +135,7 @@ def uniformCost(S0, Sf):
     A = []
     while (not(isTarget(S0,Sf))):
         F.append(S0)
-        print(S0.getId())
+        #print(S0.getId())
         # print('inicio\n')
         # for i in A:
         #     print('A antes de open nodes ' + i.getId() + '\n')
@@ -153,10 +154,6 @@ def uniformCost(S0, Sf):
     F.append(S0)
     return getPath(S0, F)
 
-
-## implementar classe com id pra nao ficar iterando na merda toda
-
 Sf = Node(FINAL_STATE, 9999999, '')
-S0 = Node(START_STATE, -1, 'mirandao')
-a = 'aaaaaaa'
+S0 = Node(START_STATE, -1, 'parent')
 uniformCost(S0, Sf)

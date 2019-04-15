@@ -93,10 +93,8 @@ def getPath(S0, F):
     path = []
     parent = S0.getParentId()
     path.append(S0.getId())
-    ### sugestao pro adas: 
-        # varrer F criando uma estrutura com fácil acesso ao id e indice do elemento em F, dessa forma fica melhor.
-        # Quem mandou ir no jogo do avai?
-    while (parent != 'mirandao'):
+    ## this could be done with better performance by generating a dictionary structure indexed by the parent id
+    while (parent != 'parent'):
         for node in F:
             if (node.getId() == parent):
                 parent = node.getParentId()
@@ -134,10 +132,7 @@ def uniformCost(S0, Sf):
     F.append(S0)
     return getPath(S0, F)
 
-
-## implementar classe com id pra nao ficar iterando na merda toda
-
 Sf = Node([1, 2, 3, 4, 5, 6, 7, 8, None], 9999999, '')
-S0 = Node([None, 7, 8, 6, 5, 4, 2, 3, 1], -1, 'mirandao')
+S0 = Node([None, 7, 8, 6, 5, 4, 2, 3, 1], -1, 'parent')
 
 uniformCost(S0, Sf)
