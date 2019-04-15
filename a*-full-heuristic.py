@@ -1,14 +1,42 @@
 from copy import deepcopy
+FINAL_STATE = [1, 2, 3, 4, 5, 6, 7, 8, None]
+START_STATE = [8, 2, None, 3, 4, 7, 5, 1, 6]
+
 class Node:
-    def __init__(self, list, parentCost, parentId):
+    def __init__(self, numberList, parentCost, parentId):
+        self.list = numberList
         self.lines = []
-        self.lines.append(list[0:3])
-        self.lines.append(list[3:6])
-        self.lines.append(list[6:9])
-        self.id = ''.join(str(x) for x in list)
+        self.lines.append(numberList[0:3])
+        self.lines.append(numberList[3:6])
+        self.lines.append(numberList[6:9])
+        self.id = ''.join(str(x) for x in numberList)
         self.cost = parentCost+1
+        self.heuristic = self.calcHeuristic()
         self.parentId = parentId
         self.noneLocation = self.getLocation()
+
+    def calcHeuristic(self):
+        global FINAL_STATE
+        heuristicValue = 0
+        for i in range(len(self.list)):
+            yi = int(i/3)
+            xi = i % 3
+            for j in range(len(FINAL_STATE)):
+                if(self.list[i] == FINAL_STATE[j]):
+                    yj = int(j/3)
+                    xj = j % 3
+                    distance = abs(xi-xj) + abs(yi-yj)
+                    heuristicValue += distance
+        return heuristicValue
+
+    def print(self):
+        print('id')
+        print(self.getId())
+        print('custo')
+        print(self.getCost())
+        print('heuristica')
+        print(self.getHeuristic())
+        print(self.getHeuristic()+self.getCost())
 
     def getLocation(self):
         for i in range(len(self.lines)):
@@ -24,6 +52,9 @@ class Node:
 
     def getCost(self):
         return self.cost
+    
+    def getHeuristic(self):
+        return self.heuristic
 
     def getLines(self):
         return self.lines
@@ -53,13 +84,13 @@ def createNodes(S, i, j):
         if(i+dir[a] <= 2 and i+dir[a] >= 0):
             parentLines = deepcopy(S.getLines())
             newList = swap(parentLines, i, j, i+dir[a], j)
-            newNode = Node(newList , S.getCost(), S.getId())
+            newNode = Node(newList , deepcopy(S.getCost()), deepcopy(S.getId()))
             newNodes.append(newNode)
     for b in range(2):
         if(j+dir[b] <= 2 and j+dir[b] >= 0):
             parentLines = deepcopy(S.getLines())
             newList = swap(parentLines, i, j, i, j+dir[b])
-            newNode = Node(newList, S.getCost(), S.getId())
+            newNode = Node(newList , deepcopy(S.getCost()), deepcopy(S.getId()))
             newNodes.append(newNode)
     return newNodes
 
@@ -87,7 +118,7 @@ def mergeLists(A, newA):
     return A+newA
 
 def leastCost(elem):
-    return elem.getCost()
+    return elem.getCost()+elem.getHeuristic()
 
 def getPath(S0, F):
     path = []
@@ -111,10 +142,9 @@ def getPath(S0, F):
 def uniformCost(S0, Sf):
     F = []
     A = []
-    z = 0
     while (not(isTarget(S0,Sf))):
         F.append(S0)
-        print(z)
+        print(S0.print())
         # print('inicio\n')
         # for i in A:
         #     print('A antes de open nodes ' + i.getId() + '\n')
@@ -125,19 +155,18 @@ def uniformCost(S0, Sf):
         # for i in A:
         #     print('A mergeado com newA ' + i.getId() + '\n')
         A = deleteClosedNodes(A, F)
-        # for i in A:
-        #     print('A com F removido ' + i.getId() + '\n')
         A.sort(key=leastCost)
+        for i in A:
+            print('A sorted ' + i.getId() + ' custo ' + str(i.getCost()+i.getHeuristic()) + '\n')
         S0 = A[0]
         A.remove(S0)
-        z+=1
     F.append(S0)
     return getPath(S0, F)
 
 
 ## implementar classe com id pra nao ficar iterando na merda toda
 
-Sf = Node([1, 2, 3, 4, 5, 6, 7, 8, None], 9999999, '')
-S0 = Node([None, 7, 8, 6, 5, 4, 2, 3, 1], -1, 'mirandao')
-
+Sf = Node(FINAL_STATE, 9999999, '')
+S0 = Node(START_STATE, -1, 'mirandao')
+a = 'aaaaaaa'
 uniformCost(S0, Sf)

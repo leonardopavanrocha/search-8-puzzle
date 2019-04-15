@@ -1,4 +1,7 @@
 from copy import deepcopy
+FINAL_STATE = [1, 2, 3, 4, 5, 6, 7, 8, None]
+START_STATE = [None, 7, 8, 6, 5, 4, 2, 3, 1]
+
 class Node:
     def __init__(self, list, parentCost, parentId):
         self.lines = []
@@ -7,8 +10,23 @@ class Node:
         self.lines.append(list[6:9])
         self.id = ''.join(str(x) for x in list)
         self.cost = parentCost+1
+        self.heuristic = self.calcHeuristic()
         self.parentId = parentId
         self.noneLocation = self.getLocation()
+
+    def calcHeuristic(self):
+        global FINAL_STATE
+        heuristicValue = 0
+        flatLines = []
+        # converts lines to one dimension list
+        for sublist in self.lines:
+            for item in sublist:
+                flatLines.append(item)
+        
+        for i in range(len(flatLines)):
+            if(flatLines[i] != FINAL_STATE[i]):
+                heuristicValue+=1
+        return heuristicValue
 
     def getLocation(self):
         for i in range(len(self.lines)):
@@ -24,6 +42,9 @@ class Node:
 
     def getCost(self):
         return self.cost
+    
+    def getHeuristic(self):
+        return self.heuristic
 
     def getLines(self):
         return self.lines
@@ -87,7 +108,7 @@ def mergeLists(A, newA):
     return A+newA
 
 def leastCost(elem):
-    return elem.getCost()
+    return elem.getCost()+elem.getHeuristic()
 
 def getPath(S0, F):
     path = []
@@ -111,10 +132,9 @@ def getPath(S0, F):
 def uniformCost(S0, Sf):
     F = []
     A = []
-    z = 0
     while (not(isTarget(S0,Sf))):
         F.append(S0)
-        print(z)
+        print(S0.getId())
         # print('inicio\n')
         # for i in A:
         #     print('A antes de open nodes ' + i.getId() + '\n')
@@ -130,14 +150,13 @@ def uniformCost(S0, Sf):
         A.sort(key=leastCost)
         S0 = A[0]
         A.remove(S0)
-        z+=1
     F.append(S0)
     return getPath(S0, F)
 
 
 ## implementar classe com id pra nao ficar iterando na merda toda
 
-Sf = Node([1, 2, 3, 4, 5, 6, 7, 8, None], 9999999, '')
-S0 = Node([None, 7, 8, 6, 5, 4, 2, 3, 1], -1, 'mirandao')
-
+Sf = Node(FINAL_STATE, 9999999, '')
+S0 = Node(START_STATE, -1, 'mirandao')
+a = 'aaaaaaa'
 uniformCost(S0, Sf)
