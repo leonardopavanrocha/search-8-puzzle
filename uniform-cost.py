@@ -1,4 +1,9 @@
 from copy import deepcopy
+FINAL_STATE = [1, 2, 3, 4, 5, 6, 7, 8, None]
+START_STATE = [3, None, 7, 2, 8, 1, 6, 4, 5]
+
+## this start state reaches the final state in less steps
+## START_STATE = [1, 2, None, 4, 6, 3, 7, 5, 8]
 class Node:
     def __init__(self, list, parentCost, parentId):
         self.lines = []
@@ -91,17 +96,17 @@ def leastCost(elem):
 
 def getPath(S0, F):
     path = []
-    parent = S0.getParentId()
-    path.append(S0.getId())
-    ## this could be done with better performance by generating a dictionary structure indexed by the parent id
+    parent = S0.getId()
+    indexedF = {}
+    for node in F:
+        indexedF[node.getId()] = node
+
     while (parent != 'parent'):
-        for node in F:
-            if (node.getId() == parent):
-                parent = node.getParentId()
-                path.append(node.getId())
-                print(path)
-                F.remove(node)
-    path.append(parent)
+        current = indexedF[parent]
+        path.append(current.getId())
+        parent = current.getParentId()
+    print('Tamanho do caminho: ' + str(len(path)))
+    print(list(reversed(path)))
     return list(reversed(path))
 
     
@@ -109,10 +114,10 @@ def getPath(S0, F):
 def uniformCost(S0, Sf):
     F = []
     A = []
-    z = 0
+    visitedNodes = 0
+    largestBorder = 0
     while (not(isTarget(S0,Sf))):
         F.append(S0)
-        print(z)
         # print('inicio\n')
         # for i in A:
         #     print('A antes de open nodes ' + i.getId() + '\n')
@@ -126,13 +131,17 @@ def uniformCost(S0, Sf):
         # for i in A:
         #     print('A com F removido ' + i.getId() + '\n')
         A.sort(key=leastCost)
+        if (largestBorder < len(A)):
+            largestBorder = len(A)
         S0 = A[0]
         A.remove(S0)
-        z+=1
+        visitedNodes+=1
     F.append(S0)
+    print('Nodos visitados: ' + str(visitedNodes))
+    print('Maior fronteira: ' + str(largestBorder))
     return getPath(S0, F)
 
-Sf = Node([1, 2, 3, 4, 5, 6, 7, 8, None], 9999999, '')
-S0 = Node([None, 7, 8, 6, 5, 4, 2, 3, 1], -1, 'parent')
+Sf = Node(FINAL_STATE, 9999999, '')
+S0 = Node(START_STATE, -1, 'parent')
 
 uniformCost(S0, Sf)

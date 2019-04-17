@@ -1,6 +1,9 @@
 from copy import deepcopy
 FINAL_STATE = [1, 2, 3, 4, 5, 6, 7, 8, None]
-START_STATE = [8, 2, None, 3, 4, 7, 5, 1, 6]
+START_STATE = [3, None, 7, 2, 8, 1, 6, 4, 5]
+
+## this start state reaches the final state in less steps
+## START_STATE = [1, 2, None, 4, 6, 3, 7, 5, 8]
 
 class Node:
     def __init__(self, numberList, parentCost, parentId):
@@ -125,27 +128,27 @@ def leastCost(elem):
 
 def getPath(S0, F):
     path = []
-    parent = S0.getParentId()
-    path.append(S0.getId())
-    ## this could be done with better performance by generating a dictionary structure indexed by the parent id
-    while (parent != 'parent'):
-        for node in F:
-            if (node.getId() == parent):
-                parent = node.getParentId()
-                path.append(node.getId())
-                print(path)
-                F.remove(node)
-    path.append(parent)
-    return list(reversed(path))
+    parent = S0.getId()
+    indexedF = {}
+    for node in F:
+        indexedF[node.getId()] = node
 
-    
+    while (parent != 'parent'):
+        current = indexedF[parent]
+        path.append(current.getId())
+        parent = current.getParentId()
+    print('Tamanho do caminho: ' + str(len(path)))
+    print(list(reversed(path)))
+    return list(reversed(path))
 
 def uniformCost(S0, Sf):
     F = []
     A = []
+    visitedNodes = 0
+    largestBorder = 0
     while (not(isTarget(S0,Sf))):
         F.append(S0)
-        print(S0.print())
+        #print(S0.print())
         # print('inicio\n')
         # for i in A:
         #     print('A antes de open nodes ' + i.getId() + '\n')
@@ -157,11 +160,16 @@ def uniformCost(S0, Sf):
         #     print('A mergeado com newA ' + i.getId() + '\n')
         A = deleteClosedNodes(A, F)
         A.sort(key=leastCost)
-        for i in A:
-            print('A sorted ' + i.getId() + ' custo ' + str(i.getCost()+i.getHeuristic()) + '\n')
+        if (largestBorder < len(A)):
+            largestBorder = len(A)
+        # for i in A:
+        #     print('A sorted ' + i.getId() + ' custo ' + str(i.getCost()+i.getHeuristic()) + '\n')
         S0 = A[0]
         A.remove(S0)
+        visitedNodes+=1
     F.append(S0)
+    print('Nodos visitados: ' + str(visitedNodes))
+    print('Maior fronteira: ' + str(largestBorder))
     return getPath(S0, F)
 
 Sf = Node(FINAL_STATE, 9999999, '')
